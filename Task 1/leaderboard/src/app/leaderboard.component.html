@@ -1,0 +1,179 @@
+<div class="page">
+  <h1 class="page-title">Company Leader Board {{ year() === 'All' ? '' : year() }}</h1>
+
+  <section class="board">
+    <header class="board-header">
+      <h2>Leaderboard</h2>
+      <p class="muted">Top performers based on contributions and activity</p>
+    </header>
+
+    <div class="filters">
+      <select [ngModel]="year()" (ngModelChange)="onYearChange($event)" aria-label="Year">
+        <option value="All">All Years</option>
+        @for (y of availableYears(); track y) {
+          <option [ngValue]="y">{{ y }}</option>
+        }
+      </select>
+
+      <select [ngModel]="quarter()" (ngModelChange)="quarter.set($event)" aria-label="Quarter">
+        @for (q of quarters; track q) {
+          <option [ngValue]="q">{{ q === 'All' ? 'All Quarters' : q }}</option>
+        }
+      </select>
+
+      <select [ngModel]="category()" (ngModelChange)="category.set($event)" aria-label="Category">
+        <option [ngValue]="'All'">All Categories</option>
+        @for (c of allCategories; track c) {
+          <option [ngValue]="c">{{ c }}</option>
+        }
+      </select>
+
+      <div class="search">
+        <span class="search-icon" aria-hidden="true">⌕</span>
+        <input
+          type="text"
+          placeholder="Search employee..."
+          [ngModel]="search()"
+          (ngModelChange)="search.set($event)" />
+      </div>
+    </div>
+
+    @if (podium().first || podium().second || podium().third) {
+      <div class="podium">
+        <!-- 2nd -->
+        <div class="podium-slot slot-2">
+          @if (podium().second; as u) {
+            <div class="podium-card">
+              <div class="avatar-wrap rank-2">
+                <img [src]="u.avatar" [alt]="fullName(u)" />
+                <span class="rank-badge">2</span>
+              </div>
+              <div class="podium-name">{{ fullName(u) }}</div>
+              <div class="podium-position">{{ u.position }}</div>
+              <div class="points-pill">
+                <span class="star">★</span>
+                <span>{{ u.totalPoints }}</span>
+              </div>
+            </div>
+          }
+          <div class="podium-base base-2"><span>2</span></div>
+        </div>
+
+        <!-- 1st -->
+        <div class="podium-slot slot-1">
+          @if (podium().first; as u) {
+            <div class="podium-card">
+              <div class="avatar-wrap rank-1">
+                <img [src]="u.avatar" [alt]="fullName(u)" />
+                <span class="rank-badge gold">1</span>
+              </div>
+              <div class="podium-name">{{ fullName(u) }}</div>
+              <div class="podium-position">{{ u.position }}</div>
+              <div class="points-pill gold">
+                <span class="star">★</span>
+                <span>{{ u.totalPoints }}</span>
+              </div>
+            </div>
+          }
+          <div class="podium-base base-1"><span>1</span></div>
+        </div>
+
+        <!-- 3rd -->
+        <div class="podium-slot slot-3">
+          @if (podium().third; as u) {
+            <div class="podium-card">
+              <div class="avatar-wrap rank-3">
+                <img [src]="u.avatar" [alt]="fullName(u)" />
+                <span class="rank-badge">3</span>
+              </div>
+              <div class="podium-name">{{ fullName(u) }}</div>
+              <div class="podium-position">{{ u.position }}</div>
+              <div class="points-pill">
+                <span class="star">★</span>
+                <span>{{ u.totalPoints }}</span>
+              </div>
+            </div>
+          }
+          <div class="podium-base base-3"><span>3</span></div>
+        </div>
+      </div>
+    }
+
+    <ul class="user-list">
+      @for (u of filteredUsers(); track trackById($index, u)) {
+        <li class="user-row" [class.expanded]="isExpanded(u.id)">
+          <button class="row-summary" (click)="toggle(u.id)" [attr.aria-expanded]="isExpanded(u.id)">
+            <span class="rank-col">{{ u.rank }}</span>
+            <img class="row-avatar" [src]="u.avatar" [alt]="fullName(u)" />
+            <span class="row-id">
+              <span class="row-name">{{ fullName(u) }}</span>
+              <span class="row-position">{{ u.position }}</span>
+            </span>
+
+            <span class="row-activity-icons">
+              @if (u.countsByCategory['Education']) {
+                <span class="act-icon" title="Education">
+                  <span class="ico">🎓</span>
+                  <span class="cnt">{{ u.countsByCategory['Education'] }}</span>
+                </span>
+              }
+              @if (u.countsByCategory['Public Speaking']) {
+                <span class="act-icon" title="Public Speaking">
+                  <span class="ico">🎤</span>
+                  <span class="cnt">{{ u.countsByCategory['Public Speaking'] }}</span>
+                </span>
+              }
+              @if (u.countsByCategory['Partnership']) {
+                <span class="act-icon" title="Partnership">
+                  <span class="ico">🤝</span>
+                  <span class="cnt">{{ u.countsByCategory['Partnership'] }}</span>
+                </span>
+              }
+            </span>
+
+            <span class="row-total">
+              <span class="total-label">TOTAL</span>
+              <span class="total-value"><span class="star">★</span>{{ u.totalPoints }}</span>
+            </span>
+
+            <span class="chevron" [class.open]="isExpanded(u.id)" aria-hidden="true">▾</span>
+          </button>
+
+          @if (isExpanded(u.id)) {
+            <div class="row-details">
+              <div class="recent-label">RECENT ACTIVITY</div>
+              <table class="activity-table">
+                <thead>
+                  <tr>
+                    <th class="col-activity">ACTIVITY</th>
+                    <th class="col-cat">CATEGORY</th>
+                    <th class="col-date">DATE</th>
+                    <th class="col-points">POINTS</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (a of u.activities; track a.id) {
+                    <tr>
+                      <td>{{ a.name }}</td>
+                      <td>
+                        <span class="cat-pill" [attr.data-cat]="a.category">{{ a.category }}</span>
+                      </td>
+                      <td>{{ formatDate(a.date) }}</td>
+                      <td class="points-cell">+{{ a.points }}</td>
+                    </tr>
+                  }
+                  @if (!u.activities.length) {
+                    <tr><td colspan="4" class="empty">No activities for selected filters.</td></tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+        </li>
+      }
+      @if (!filteredUsers().length) {
+        <li class="empty-state">No employees match the current filters.</li>
+      }
+    </ul>
+  </section>
+</div>
