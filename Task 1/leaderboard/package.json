@@ -7,7 +7,8 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "build:ghpages": "ng build --base-href ./ && cp dist/leaderboard/browser/index.html dist/leaderboard/browser/404.html && touch dist/leaderboard/browser/.nojekyll"
+    "build:ghpages": "ng build --base-href /AI-Challenge-2026/leaderboard/ && cp dist/leaderboard/browser/index.html dist/leaderboard/browser/404.html && touch dist/leaderboard/browser/.nojekyll",
+    "deploy:ghpages": "npm run build:ghpages && gh-pages -d dist/leaderboard/browser -e leaderboard --no-clean"
   },
   "private": true,
   "dependencies": {
