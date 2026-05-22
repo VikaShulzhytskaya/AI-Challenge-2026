@@ -1,0 +1,9 @@
+{
+  "servers": {
+    "air-traffic-control": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["tsx", "src/index.ts"]
+    }
+  }
+}
